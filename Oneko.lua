@@ -17,13 +17,18 @@ local neededFrames = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 25
 local frames = {}
 local loading = {}
 
+local function isValidImage(data)
+	if not data or #data < 8 then return false end
+	return data:sub(1, 4) == "\137PNG" or data:sub(1, 3) == "GIF"
+end
+
 local function getFrame(n)
 	if frames[n] or loading[n] then return end
 	loading[n] = true
 	task.spawn(function()
 		for _, ext in ipairs(exts) do
 			local ok, data = pcall(game.HttpGet, game, baseUrl .. n .. ext)
-			if ok and data and #data > 0 then
+			if ok and isValidImage(data) then
 				frames[n] = data
 				break
 			end
